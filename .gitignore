@@ -1,0 +1,6 @@
+*.build
+*.jiproj
+*.jungle*
+art
+flixel
+progress
