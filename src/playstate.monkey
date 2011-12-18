@@ -46,8 +46,7 @@ Public
 		_cylinders = New FlxGroup()
 		Add(_cylinders)
 		
-		Local firstCylinder:Cylinder = New Cylinder(FlxG.DEVICE_WIDTH / 2, 200, Cylinder.TYPE_NITRO)
-		_cylinders.Add(firstCylinder)
+		_GenerateCylinder(FlxG.DEVICE_WIDTH / 2, 200, Cylinder.TYPE_NITRO)
 		
 		astronaut = New Astronaut()
 		Add(astronaut)
@@ -97,6 +96,13 @@ Public
 		DrawImage(_bg[2], 0, _bgScroll + _bg[0].Height())
 
 		Super.Draw()		
+	End Method
+
+Private	
+	Method _GenerateCylinder:Void(x:Float, y:Float, type:Int)
+		Local cylinder:Cylinder = Cylinder(_cylinders.Recycle(Cylinder.CLASS_OBJECT))
+		cylinder.SetPos(x, y)
+		cylinder.Type = type
 	End Method
 	
 End Class
