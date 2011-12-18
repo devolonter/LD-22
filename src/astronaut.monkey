@@ -9,7 +9,7 @@ Class Astronaut Extends FlxSprite
 
 	Const SENSITIVITY:Float = 2
 	Const MAX_ACCELERATE:Float = 5
-	Const NITRO_ACCELERATE:Float = 20
+	Const NITRO_ACCELERATE:Float = 10
 	Const FRICTION:Float = 0.03
 	Const MAX_ANGLE:Float = 130
 	Const MIN_ANGLE:Float = 50
@@ -21,6 +21,8 @@ Class Astronaut Extends FlxSprite
 
 	Field angle:Float
 	Field accelerate:Float
+	Field gasAccelerate:Float
+	Field nitroAccelerate:Float
 	Field speed:FlxPoint
 	
 	Field oxygen:Float = ProgressBar.MAX_VALUE
@@ -67,22 +69,28 @@ Public
 		
 		angle = Clamp(angle, MIN_ANGLE, MAX_ANGLE)
 		
-		accelerate -= FRICTION
+		accelerate = Max(accelerate - FRICTION, 0.0)
 		
 		If (KeyDown(KEY_SPACE)) Then
 			_gasForce += FlxG.elapsed / 10		
-			accelerate = Min(accelerate + _gasForce, NITRO_ACCELERATE)
+			gasAccelerate = Min(gasAccelerate + _gasForce, MAX_ACCELERATE)
 			gas = Max(gas - FlxG.elapsed / GAS_CONSUMPTION, 0.0)
 		Else
+			gasAccelerate = 0
 			_gasForce = 0
 		End If
 		
 		If (nitro > 0) Then
-			accelerate = NITRO_ACCELERATE
-			nitro = Max(nitro - FlxG.elapsed / NITRO_CONSUMPTION, 0.0)	
+			nitroAccelerate = NITRO_ACCELERATE
+			nitro = Max(nitro - FlxG.elapsed / NITRO_CONSUMPTION, 0.0)
+		Else	
+			nitroAccelerate = 0
+			'nitroAccelerate = Max(nitroAccelerate - FRICTION * 10, 0.0) 	
 		End If
 		
-		accelerate = Max(accelerate, 0.0)
+		If (gasAccelerate > 0 Or nitroAccelerate > 0) Then
+			accelerate = Clamp(gasAccelerate + nitroAccelerate, accelerate, MAX_ACCELERATE + NITRO_ACCELERATE)
+		End If
 		
 		speed.x = Cos(-angle) * accelerate
 		speed.y = Sin(-angle) * accelerate

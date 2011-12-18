@@ -6,14 +6,18 @@ Import src.astronaut
 Import src.progressbar
 Import src.alonegame
 Import src.cylinder
+Import src.bigasteroid
 
 Class PlayState Extends FlxState
 
 	Global CLASS_OBJECT:FlxClass = New PlayStateClass()
 	
-	Const SPACESHIP_SPEED:Float = 10
+	Const SPACESHIP_SPEED:Float = 5
 	Const PIXELS_PER_KM:Int = 20
-	Const NITRO_PERIOD:Float = 2	
+	Const NITRO_PERIOD:Float = 2
+	Const NITRO_NEEDED_SPEED:Float = Astronaut.MAX_ACCELERATE - 1
+	Const ASTEROIDS_PERIOD:Float = 1
+	Const ASTEROID_NEEDED_SPEED:Float = Astronaut.MAX_ACCELERATE - 1	
 	
 	Field astronaut:Astronaut
 	Field gas:ProgressBar
@@ -33,13 +37,17 @@ Private
 
 	Field _cylinders:FlxGroup
 	Field _tmpCylinder:Cylinder
-	Field _nitroLastTime:Float
+	Field _elapsedNitroTime:Float
+	
+	Field _bigAsteroids:FlxGroup
+	Field _tmpBigAsteroid:BigAsteroid
+	Field _elpasedBigAsteroidTime:Float
 	
 	Field _gameStarted:Bool = False
 	
 Public	
 	Method Create:Void()	
-		_cameraBound = New FlxRect(100, 400, 600, 0)
+		_cameraBound = New FlxRect(100, 450, 600, 0)
 	
 		If (bgSprite = Null) Then
 			bgSprite = LoadImage("gfx/bg.jpg")
@@ -58,10 +66,16 @@ Public
 		
 		_GenerateCylinder(FlxG.DEVICE_WIDTH / 2, 200, Cylinder.TYPE_NITRO)
 		
+		_bigAsteroids = New FlxGroup()
+		Add(_bigAsteroids)
+		
+		_GenerateBigAsteroid(Rnd(_cameraBound.Left, _cameraBound.Right), -200)
+		
+		
 		astronaut = New Astronaut()
 		Add(astronaut)
 		
-		_collisionsBound = New FlxRect(_cameraBound.x, _cameraBound.y - astronaut.width - 10, _cameraBound.width, astronaut.width)
+		_collisionsBound = New FlxRect(0, _cameraBound.y - astronaut.width / 2, FlxG.DEVICE_WIDTH, astronaut.width)
 		
 		oxygen = New ProgressBar(10, FlxG.DEVICE_HEIGHT - 30, AloneGame.OXYGEN_COLOR)
 		Add(oxygen)
@@ -97,37 +111,61 @@ Public
 			
 			If (_tmpCylinder <> Null And _tmpCylinder.alive) Then
 				_tmpCylinder.y -= astronaut.speed.y
-				If (_tmpCylinder.y > _collisionsBound.Top And _tmpCylinder.y < _collisionsBound.Bottom) Then
+				If (_tmpCylinder.y + _tmpCylinder.height > _collisionsBound.Top And _tmpCylinder.y < _collisionsBound.Bottom) Then
 					If (Collision.PolyToPoly(astronaut.GetCollisionMask(), _tmpCylinder.GetCollisionMask())) Then
 						_tmpCylinder.Kill()
 						astronaut.nitro = ProgressBar.MAX_VALUE
-						_nitroLastTime = NITRO_PERIOD
+						_elapsedNitroTime = NITRO_PERIOD
 						_gameStarted = True	
 					End If
 				End If
 				
-				If (_tmpCylinder.y > FlxG.DEVICE_HEIGHT) _tmpCylinder.Kill()
+				If (_tmpCylinder.y > FlxG.DEVICE_HEIGHT) Then
+					_tmpCylinder.Kill()
+					_gameStarted = True	
+				End If
 			End If
 				
 		Next
 		
-		If (_nitroLastTime <> -1) _nitroLastTime -= FlxG.elapsed
+		_elapsedNitroTime -= FlxG.elapsed
 		
-		If (_gameStarted And _nitroLastTime <= 0) Then
-			If (Abs(astronaut.speed.y) > 18) Then
-				_tmpCylinder = Cylinder(_cylinders.Recycle(Cylinder.CLASS_OBJECT))
-				_tmpCylinder.SetPos(Rnd(_cameraBound.Left, _cameraBound.Right), -100)
-				_tmpCylinder.Type = Cylinder.TYPE_NITRO
-				_tmpCylinder.Revive()
+		For Local bigAteroid:FlxBasic = EachIn _bigAsteroids
+			_tmpBigAsteroid = BigAsteroid(bigAteroid)
+			
+			If (_tmpBigAsteroid <> Null And _tmpBigAsteroid.alive) Then
+				_tmpBigAsteroid.y -= astronaut.speed.y
+				
+				If (_tmpBigAsteroid.y > FlxG.DEVICE_HEIGHT) Then
+					_tmpBigAsteroid.Kill()
+					_gameStarted = True	
+				End If
+			End If
+				
+		Next
+				
+		If (_gameStarted And _elapsedNitroTime <= 0) Then
+			If (Abs(astronaut.speed.y) > NITRO_NEEDED_SPEED) Then
+				_GenerateCylinder(Rnd(_cameraBound.Left, _cameraBound.Right), -100, Cylinder.TYPE_NITRO)				
 			End If
 			
-			_nitroLastTime = NITRO_PERIOD
+			_elapsedNitroTime = NITRO_PERIOD
+		End If
+		
+		_elpasedBigAsteroidTime -= FlxG.elapsed
+		
+		If (_gameStarted And _elpasedBigAsteroidTime <= 0) Then
+			If (Abs(astronaut.speed.y) > ASTEROID_NEEDED_SPEED) Then
+				_GenerateBigAsteroid(Rnd(_cameraBound.Left, _cameraBound.Right), -100)				
+			End If
+		
+			_elpasedBigAsteroidTime = ASTEROIDS_PERIOD
 		End If
 		
 		distance.Text = "Distance: " + Ceil(_spaceshipDistancePassed + _distancePassed)  + " km"
 		
 		If (astronaut.speed.y <> 0) Then
-			FlxG.camera.Shake(-astronaut.speed.y / 5000, 0.1)
+			FlxG.camera.Shake(-astronaut.speed.y / 3000, 0.1)
 		End If
 	End Method
 	
@@ -135,6 +173,10 @@ Public
 		DrawImage(_bg[0], 0, _bgScroll)
 		DrawImage(_bg[1], 0, _bgScroll - _bg[0].Height())
 		DrawImage(_bg[2], 0, _bgScroll + _bg[0].Height())
+		
+		#If CONFIG="debug"
+			DrawRect(_collisionsBound.Left, _collisionsBound.Top, _collisionsBound.width, _collisionsBound.height)
+		#End
 
 		Super.Draw()		
 	End Method
@@ -144,6 +186,14 @@ Private
 		_tmpCylinder = Cylinder(_cylinders.Recycle(Cylinder.CLASS_OBJECT))
 		_tmpCylinder.SetPos(x, y)
 		_tmpCylinder.Type = type
+		_tmpCylinder.Revive()
+	End Method
+	
+	Method _GenerateBigAsteroid:Void(x:Float, y:Float)
+		_tmpBigAsteroid = BigAsteroid(_bigAsteroids.Recycle(BigAsteroid.CLASS_OBJECT))
+		_tmpBigAsteroid.SetPos(x, y)
+		_tmpBigAsteroid.SetType(Rnd(0, 5))
+		_tmpBigAsteroid.Revive()
 	End Method
 	
 End Class
