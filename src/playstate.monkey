@@ -12,7 +12,8 @@ Class PlayState Extends FlxState
 	Global CLASS_OBJECT:FlxClass = New PlayStateClass()
 	
 	Const SPACESHIP_SPEED:Float = 10
-	Const PIXELS_PER_KM:Int = 20	
+	Const PIXELS_PER_KM:Int = 20
+	Const NITRO_PERIOD:Float = 2	
 	
 	Field astronaut:Astronaut
 	Field gas:ProgressBar
@@ -32,15 +33,21 @@ Private
 
 	Field _cylinders:FlxGroup
 	Field _tmpCylinder:Cylinder
+	Field _nitroLastTime:Float
+	
+	Field _gameStarted:Bool = False
 	
 Public	
 	Method Create:Void()	
 		_cameraBound = New FlxRect(100, 400, 600, 0)
 	
-		Local bg:Image = LoadImage("gfx/bg.jpg")
-		_bg[0] = bg
-		_bg[1] = bg
-		_bg[2] = bg			
+		If (bgSprite = Null) Then
+			bgSprite = LoadImage("gfx/bg.jpg")
+		Endif
+		
+		_bg[0] = bgSprite
+		_bg[1] = bgSprite
+		_bg[2] = bgSprite			
 		
 		distance = New FlxText(10, 10, FlxG.DEVICE_WIDTH - 20, "", New FlxTextAngelFontDriver())
 		distance.SetFormat("orbitrton", 28, FlxG.WHITE, FlxText.ALIGN_RIGHT)
@@ -66,7 +73,7 @@ Public
 		nitro.value = 0
 		Add(nitro)
 		
-		_spaceshipDistancePassed = 1000
+		_spaceshipDistancePassed = 50000
 	End Method
 	
 	Method Update:Void()
@@ -74,12 +81,12 @@ Public
 		
 		oxygen.value = astronaut.oxygen
 		gas.value = astronaut.gas
-		nitro.value = astronaut.nitro
+		nitro.value = astronaut.nitro		
 		
 		_distancePassed += astronaut.speed.y / PIXELS_PER_KM
 		_spaceshipDistancePassed += SPACESHIP_SPEED / PIXELS_PER_KM
 				
-		_bgScroll -= astronaut.speed.y*.9
+		_bgScroll -= astronaut.speed.y*.3
 		If (Abs(_bgScroll) >  _bg[0].Height()) _bgScroll = 0
 		
 		astronaut.x = Clamp(astronaut.x, _cameraBound.Left, _cameraBound.Right)
@@ -93,7 +100,9 @@ Public
 				If (_tmpCylinder.y > _collisionsBound.Top And _tmpCylinder.y < _collisionsBound.Bottom) Then
 					If (Collision.PolyToPoly(astronaut.GetCollisionMask(), _tmpCylinder.GetCollisionMask())) Then
 						_tmpCylinder.Kill()
-						astronaut.nitro = ProgressBar.MAX_VALUE	
+						astronaut.nitro = ProgressBar.MAX_VALUE
+						_nitroLastTime = NITRO_PERIOD
+						_gameStarted = True	
 					End If
 				End If
 				
@@ -101,6 +110,19 @@ Public
 			End If
 				
 		Next
+		
+		If (_nitroLastTime <> -1) _nitroLastTime -= FlxG.elapsed
+		
+		If (_gameStarted And _nitroLastTime <= 0) Then
+			If (Abs(astronaut.speed.y) > 18) Then
+				_tmpCylinder = Cylinder(_cylinders.Recycle(Cylinder.CLASS_OBJECT))
+				_tmpCylinder.SetPos(Rnd(_cameraBound.Left, _cameraBound.Right), -100)
+				_tmpCylinder.Type = Cylinder.TYPE_NITRO
+				_tmpCylinder.Revive()
+			End If
+			
+			_nitroLastTime = NITRO_PERIOD
+		End If
 		
 		distance.Text = "Distance: " + Ceil(_spaceshipDistancePassed + _distancePassed)  + " km"
 		
@@ -137,3 +159,6 @@ Class PlayStateClass Implements FlxClass
 	End Method
 
 End Class
+
+Private
+	Global bgSprite:Image

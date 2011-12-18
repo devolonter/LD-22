@@ -18,7 +18,11 @@ Private
 	
 Public
 	Method New(x:Float = 0, y:Float = 0, type:Int = TYPE_NITRO)
-		_sprite = LoadImage("gfx/cylinders.png", TYPE_NITRO + 1)
+		If (cylindersSprites = Null) Then
+			cylindersSprites = LoadImage("gfx/cylinders.png", TYPE_NITRO + 1)
+		End If
+		
+		_sprite = cylindersSprites
 		
 		width = _sprite.Width()
 		height = _sprite.Height()
@@ -81,3 +85,6 @@ Class CylinderClass Implements FlxClass
 	End Method
  
 End Class
+
+Private
+	Global cylindersSprites:Image

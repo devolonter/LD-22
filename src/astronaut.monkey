@@ -1,4 +1,4 @@
-Strict
+﻿Strict
 
 Import flixel
 Import src.playstate
@@ -13,6 +13,11 @@ Class Astronaut Extends FlxSprite
 	Const FRICTION:Float = 0.03
 	Const MAX_ANGLE:Float = 130
 	Const MIN_ANGLE:Float = 50
+	
+	'Чем меньше чем больше расход
+	Const NITRO_CONSUMPTION:Float = 5
+	Const GAS_CONSUMPTION:Float = 50
+	Const OXYGEN_CONSUMPTION:Float = 100
 
 	Field angle:Float
 	Field accelerate:Float
@@ -24,16 +29,21 @@ Class Astronaut Extends FlxSprite
 	
 Private
 	Field _sprite:Image
-	Field _nitroSprite:Image
+	Field _gasSprite:Image
 	
 	Field _collisionsPoly:Float[]
 	
-	Field _gasTime:Float	
+	Field _gasForce:Float	
 	
 Public	
 	Method New()
-		_sprite = LoadImage("gfx/astronaut.png", 1, Image.MidHandle)
-		_nitroSprite = LoadImage("gfx/nitro.png", 1, Image.MidHandle)	
+		If (astronautSprite = Null) Then
+			astronautSprite = LoadImage("gfx/astronaut.png", 1, Image.MidHandle)
+			gasSprite = LoadImage("gfx/gas.png", 1, Image.MidHandle)
+		End if
+		
+		_sprite	= astronautSprite
+		_gasSprite = gasSprite
 		
 		x = (FlxG.DEVICE_WIDTH / 2)
 		y = (FlxG.DEVICE_HEIGHT - 150)
@@ -60,16 +70,16 @@ Public
 		accelerate -= FRICTION
 		
 		If (KeyDown(KEY_SPACE)) Then
-			_gasTime += FlxG.elapsed / 5		
-			accelerate = Min(accelerate + _gasTime, MAX_ACCELERATE)
-			gas -= FlxG.elapsed / 50
+			_gasForce += FlxG.elapsed / 10		
+			accelerate = Min(accelerate + _gasForce, NITRO_ACCELERATE)
+			gas = Max(gas - FlxG.elapsed / GAS_CONSUMPTION, 0.0)
 		Else
-			_gasTime = 0
+			_gasForce = 0
 		End If
 		
 		If (nitro > 0) Then
 			accelerate = NITRO_ACCELERATE
-			nitro = Max(nitro - FlxG.elapsed / 5, 0.0)	
+			nitro = Max(nitro - FlxG.elapsed / NITRO_CONSUMPTION, 0.0)	
 		End If
 		
 		accelerate = Max(accelerate, 0.0)
@@ -80,7 +90,7 @@ Public
 		x += speed.x
 		y += speed.y
 		
-		oxygen -= FlxG.elapsed / 100		
+		oxygen = Max(oxygen - FlxG.elapsed / OXYGEN_CONSUMPTION, 0.0)		
 	End Method
 	
 	Method Draw:Void()
@@ -94,9 +104,9 @@ Public
 			Translate(x, y)			
 			Rotate(angle)			
 			DrawImage(_sprite, 0, 0)
-			If (_gasTime > 0 Or nitro > 0) Then
-				Scale(1 + .05 * Sin(_gasTime * 5000), 1)
-				DrawImage(_nitroSprite, -34, -3)
+			If (_gasForce > 0 Or nitro > 0) Then
+				Scale(1 + .05 * Sin(_gasForce * 5000), 1)
+				DrawImage(_gasSprite, -34, -3)
 			End if
 		PopMatrix()				
 	End Method
@@ -106,3 +116,7 @@ Public
 	End Method
 
 End Class
+
+Private
+	Global astronautSprite:Image
+	Global gasSprite:Image
