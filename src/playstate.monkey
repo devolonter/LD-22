@@ -5,6 +5,7 @@ Import flixel.flxtext.driver.angelfont
 Import src.astronaut
 Import src.progressbar
 Import src.alonegame
+Import src.cylinder
 
 Class PlayState Extends FlxState
 
@@ -36,10 +37,20 @@ Public
 		Local bg:Image = LoadImage("gfx/bg.jpg")
 		_bg[0] = bg
 		_bg[1] = bg
-		_bg[2] = bg
-	
+		_bg[2] = bg			
+		
+		distance = New FlxText(10, 10, FlxG.DEVICE_WIDTH - 20, "", New FlxTextAngelFontDriver())
+		distance.SetFormat("orbitrton", 28, FlxG.WHITE, FlxText.ALIGN_RIGHT)
+		Add(distance)
+		
+		_cylinders = New FlxGroup()
+		Add(_cylinders)
+		
+		Local firstCylinder:Cylinder = New Cylinder(FlxG.DEVICE_WIDTH / 2, 200, Cylinder.TYPE_NITRO)
+		_cylinders.Add(firstCylinder)
+		
 		astronaut = New Astronaut()
-		Add(astronaut)		
+		Add(astronaut)
 		
 		oxygen = New ProgressBar(10, FlxG.DEVICE_HEIGHT - 30, AloneGame.OXYGEN_COLOR)
 		Add(oxygen)
@@ -50,14 +61,6 @@ Public
 		nitro = New ProgressBar(FlxG.DEVICE_WIDTH - ProgressBar.WIDTH - 10, FlxG.DEVICE_HEIGHT - 30, AloneGame.NITRO_COLOR)
 		nitro.value = 0
 		Add(nitro)
-		
-		distance = New FlxText(10, 10, FlxG.DEVICE_WIDTH - 20, "", New FlxTextAngelFontDriver())
-		distance.SetFormat("orbitrton", 28, FlxG.WHITE, FlxText.ALIGN_RIGHT)
-		Add(distance)
-		
-		_cylinders = New FlxGroup()
-		
-		
 		
 		_spaceshipDistancePassed = 1000
 	End Method
@@ -76,6 +79,10 @@ Public
 		
 		astronaut.x = Clamp(astronaut.x, _cameraBound.Left, _cameraBound.Right)
 		astronaut.y = Clamp(astronaut.y, _cameraBound.Top, _cameraBound.Bottom)
+		
+		For Local cylinder:FlxBasic = EachIn _cylinders
+			Cylinder(cylinder).y -= astronaut.speed.y	
+		Next
 		
 		distance.Text = "Distance: " + Ceil(_spaceshipDistancePassed + _distancePassed)  + " km"
 		
