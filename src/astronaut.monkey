@@ -3,6 +3,7 @@ Strict
 Import flixel
 Import src.playstate
 Import src.progressbar
+Import src.collisions
 
 Class Astronaut Extends FlxSprite
 
@@ -24,20 +25,26 @@ Private
 	Field _sprite:Image
 	Field _nitroSprite:Image
 	
-	Field _nitroTime:Float
+	Field _collisionsPoly:Float[]
+	
+	Field _nitroTime:Float	
 	
 Public	
 	Method New()
 		_sprite = LoadImage("gfx/astronaut.png", 1, Image.MidHandle)
-		_nitroSprite = LoadImage("gfx/nitro.png", 1, Image.MidHandle)
-
-		x = FlxG.DEVICE_WIDTH / 2
-		y = FlxG.DEVICE_HEIGHT - 150	
+		_nitroSprite = LoadImage("gfx/nitro.png", 1, Image.MidHandle)	
+		
+		x = (FlxG.DEVICE_WIDTH / 2)
+		y = (FlxG.DEVICE_HEIGHT - 150)
 		width = _sprite.Width()
 		height = _sprite.Height()	
 		
 		angle = 90
-		speed = New FlxPoint()		
+		speed = New FlxPoint()
+		
+		_collisionsPoly = [0.0, 18.0, 35.0, 0.0, 105.0, 10.0, 116.0, 36.0, 110.0, 60.0, 35.0, 80.0, 0.0, 56.0]
+		'Collision.TFormPoly(_collisionsPoly, 0, 0, angle, 1, 1, _sprite.HandleX(), _sprite.HandleY())
+		'Error ""	
 	End Method
 	
 	Method Update:Void()	
@@ -73,19 +80,23 @@ Public
 		x += speed.x
 		y += speed.y
 		
-		oxygen -= FlxG.elapsed / 100
+		oxygen -= FlxG.elapsed / 100		
 	End Method
 	
 	Method Draw:Void()
+		#If CONFIG="debug"
+			DrawPoly(Collision.TFormPoly(_collisionsPoly, x, y, angle, 1, 1, _sprite.HandleX(), _sprite.HandleY()))
+		#End		
+			
 		PushMatrix()
-			Translate(x, y)
-			Rotate(angle)
+			Translate(x, y)			
+			Rotate(angle)			
 			DrawImage(_sprite, 0, 0)
 			If (_nitroTime > 0) Then
 				Scale(1 + .05 * Sin(_nitroTime * 5000), 1)
 				DrawImage(_nitroSprite, -34, -3)
 			End if
-		PopMatrix()
+		PopMatrix()				
 	End Method
 
 End Class
