@@ -20,6 +20,7 @@ Class Astronaut Extends FlxSprite
 	
 	Field oxygen:Float = ProgressBar.MAX_VALUE
 	Field gas:Float = ProgressBar.MAX_VALUE
+	Field nitro:Float = 0
 	
 Private
 	Field _sprite:Image
@@ -27,7 +28,7 @@ Private
 	
 	Field _collisionsPoly:Float[]
 	
-	Field _nitroTime:Float	
+	Field _gasTime:Float	
 	
 Public	
 	Method New()
@@ -42,9 +43,7 @@ Public
 		angle = 90
 		speed = New FlxPoint()
 		
-		_collisionsPoly = [0.0, 18.0, 35.0, 0.0, 105.0, 10.0, 116.0, 36.0, 110.0, 60.0, 35.0, 80.0, 0.0, 56.0]
-		'Collision.TFormPoly(_collisionsPoly, 0, 0, angle, 1, 1, _sprite.HandleX(), _sprite.HandleY())
-		'Error ""	
+		_collisionsPoly = [0.0, 18.0, 35.0, 0.0, 105.0, 10.0, 116.0, 36.0, 110.0, 60.0, 35.0, 80.0, 0.0, 56.0]	
 	End Method
 	
 	Method Update:Void()	
@@ -61,15 +60,16 @@ Public
 		accelerate -= FRICTION
 		
 		If (KeyDown(KEY_SPACE)) Then
-			_nitroTime += FlxG.elapsed / 5		
-			accelerate = Min(accelerate + _nitroTime, NITRO_ACCELERATE)
+			_gasTime += FlxG.elapsed / 5		
+			accelerate = Min(accelerate + _gasTime, MAX_ACCELERATE)
 			gas -= FlxG.elapsed / 50
 		Else
-			_nitroTime = 0
+			_gasTime = 0
 		End If
 		
-		If (KeyDown(KEY_N)) Then
+		If (nitro > 0) Then
 			accelerate = NITRO_ACCELERATE
+			nitro = Max(nitro - FlxG.elapsed / 5, 0.0)	
 		End If
 		
 		accelerate = Max(accelerate, 0.0)
@@ -85,18 +85,24 @@ Public
 	
 	Method Draw:Void()
 		#If CONFIG="debug"
+			SetColor(0, 0, 255)	
 			DrawPoly(Collision.TFormPoly(_collisionsPoly, x, y, angle, 1, 1, _sprite.HandleX(), _sprite.HandleY()))
+			SetColor(255, 255, 255)
 		#End		
 			
 		PushMatrix()
 			Translate(x, y)			
 			Rotate(angle)			
 			DrawImage(_sprite, 0, 0)
-			If (_nitroTime > 0) Then
-				Scale(1 + .05 * Sin(_nitroTime * 5000), 1)
+			If (_gasTime > 0 Or nitro > 0) Then
+				Scale(1 + .05 * Sin(_gasTime * 5000), 1)
 				DrawImage(_nitroSprite, -34, -3)
 			End if
 		PopMatrix()				
+	End Method
+	
+	Method GetCollisionMask:Float[]()
+		Return Collision.TFormPoly(_collisionsPoly, x, y, angle, 1, 1, _sprite.HandleX(), _sprite.HandleY())		
 	End Method
 
 End Class

@@ -25,11 +25,14 @@ Private
 	Field _bgScroll:Float
 	
 	Field _cameraBound:FlxRect
+	Field _collisionsBound:FlxRect
 	
 	Field _distancePassed:Float
 	Field _spaceshipDistancePassed:Float	
 
 	Field _cylinders:FlxGroup
+	Field _tmpCylinder:Cylinder
+	
 Public	
 	Method Create:Void()	
 		_cameraBound = New FlxRect(100, 400, 600, 0)
@@ -51,6 +54,8 @@ Public
 		astronaut = New Astronaut()
 		Add(astronaut)
 		
+		_collisionsBound = New FlxRect(_cameraBound.x, _cameraBound.y - astronaut.width - 10, _cameraBound.width, astronaut.width)
+		
 		oxygen = New ProgressBar(10, FlxG.DEVICE_HEIGHT - 30, AloneGame.OXYGEN_COLOR)
 		Add(oxygen)
 		
@@ -69,6 +74,7 @@ Public
 		
 		oxygen.value = astronaut.oxygen
 		gas.value = astronaut.gas
+		nitro.value = astronaut.nitro
 		
 		_distancePassed += astronaut.speed.y / PIXELS_PER_KM
 		_spaceshipDistancePassed += SPACESHIP_SPEED / PIXELS_PER_KM
@@ -80,7 +86,20 @@ Public
 		astronaut.y = Clamp(astronaut.y, _cameraBound.Top, _cameraBound.Bottom)
 		
 		For Local cylinder:FlxBasic = EachIn _cylinders
-			Cylinder(cylinder).y -= astronaut.speed.y	
+			_tmpCylinder = Cylinder(cylinder)
+			
+			If (_tmpCylinder <> Null And _tmpCylinder.alive) Then
+				_tmpCylinder.y -= astronaut.speed.y
+				If (_tmpCylinder.y > _collisionsBound.Top And _tmpCylinder.y < _collisionsBound.Bottom) Then
+					If (Collision.PolyToPoly(astronaut.GetCollisionMask(), _tmpCylinder.GetCollisionMask())) Then
+						_tmpCylinder.Kill()
+						astronaut.nitro = ProgressBar.MAX_VALUE	
+					End If
+				End If
+				
+				If (_tmpCylinder.y > FlxG.DEVICE_HEIGHT) _tmpCylinder.Kill()
+			End If
+				
 		Next
 		
 		distance.Text = "Distance: " + Ceil(_spaceshipDistancePassed + _distancePassed)  + " km"
@@ -100,9 +119,9 @@ Public
 
 Private	
 	Method _GenerateCylinder:Void(x:Float, y:Float, type:Int)
-		Local cylinder:Cylinder = Cylinder(_cylinders.Recycle(Cylinder.CLASS_OBJECT))
-		cylinder.SetPos(x, y)
-		cylinder.Type = type
+		_tmpCylinder = Cylinder(_cylinders.Recycle(Cylinder.CLASS_OBJECT))
+		_tmpCylinder.SetPos(x, y)
+		_tmpCylinder.Type = type
 	End Method
 	
 End Class

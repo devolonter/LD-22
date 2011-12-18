@@ -38,7 +38,7 @@ Class Collision
 		
 		If p1_xy.Length<6 Or (p1_xy.Length&1) Return False
 		If p2_xy.Length<6 Or (p2_xy.Length&1) Return False
-		
+
 		For Local i:Int=0 Until p1_xy.Length Step 2
 			If PointInPoly(p1_xy[i],p1_xy[i+1],p2_xy) Then Return True
 		Next

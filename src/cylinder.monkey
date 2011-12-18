@@ -1,6 +1,7 @@
 Strict
 
 Import flixel
+Import src.collisions
 
 Class Cylinder Extends FlxSprite
 	
@@ -19,13 +20,26 @@ Public
 	Method New(x:Float = 0, y:Float = 0, type:Int = TYPE_NITRO)
 		_sprite = LoadImage("gfx/cylinders.png", TYPE_NITRO + 1)
 		
+		width = _sprite.Width()
+		height = _sprite.Height()
+				
 		SetX(x)
 		SetY(y)
-				
-		Type = type		
+						
+		Type = type
+		_collisionsPoly = [0.0, 0.0, _sprite.Width(), 0.0, _sprite.Width(), _sprite.Height(), 0.0, _sprite.Height()]		
 	End Method
 	
 	Method Draw:Void()
+		#If CONFIG="debug"
+			PushMatrix()
+				Translate(x, y)
+				SetColor(0, 0, 255)			
+				DrawPoly(_collisionsPoly)
+				SetColor(255, 255, 255)
+			PopMatrix()
+		#End
+	
 		DrawImage(_sprite, x, y, _frame)
 	End Method
 	
@@ -48,6 +62,10 @@ Public
 	Method SetPos:Void(x:Float, y:Float)
 		SetX(x)
 		SetY(y)
+	End Method
+	
+	Method GetCollisionMask:Float[]()
+		Return Collision.TFormPoly(_collisionsPoly, x, y, 0, 1, 1, 0, 0)
 	End Method
 
 End Class
