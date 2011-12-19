@@ -84,8 +84,7 @@ Public
 			nitroAccelerate = NITRO_ACCELERATE
 			nitro = Max(nitro - FlxG.elapsed / NITRO_CONSUMPTION, 0.0)
 		Else	
-			nitroAccelerate = 0
-			'nitroAccelerate = Max(nitroAccelerate - FRICTION * 10, 0.0) 	
+			nitroAccelerate = 0	
 		End If
 		
 		If (gasAccelerate > 0 Or nitroAccelerate > 0) Then

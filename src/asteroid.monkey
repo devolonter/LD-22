@@ -20,8 +20,17 @@ Class Asteroid Extends FlxSprite
 		SetY(y)
 	End Method
 	
-	Method Draw:Void()
-		DrawImage(_sprite, x, y)	
+	Method Draw:Void()		
+		DrawImage(_sprite, x, y)
+		
+		#If CONFIG="debug"
+			PushMatrix()
+				Translate(x, y)
+				SetColor(0, 0, 255)			
+				DrawPoly(_collisionsPoly)
+				SetColor(255, 255, 255)
+			PopMatrix()
+		#End	
 	End Method
 		
 	Method GetCollisionMask:Float[]()

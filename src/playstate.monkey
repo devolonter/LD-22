@@ -70,7 +70,7 @@ Public
 		Add(_bigAsteroids)
 		
 		_GenerateBigAsteroid(Rnd(_cameraBound.Left, _cameraBound.Right), -200)
-		
+		_elpasedBigAsteroidTime = ASTEROIDS_PERIOD		
 		
 		astronaut = New Astronaut()
 		Add(astronaut)
@@ -192,8 +192,9 @@ Private
 	Method _GenerateBigAsteroid:Void(x:Float, y:Float)
 		_tmpBigAsteroid = BigAsteroid(_bigAsteroids.Recycle(BigAsteroid.CLASS_OBJECT))
 		_tmpBigAsteroid.SetPos(x, y)
-		_tmpBigAsteroid.SetType(Rnd(0, 5))
-		_tmpBigAsteroid.Revive()
+		_tmpBigAsteroid.SetType(BigAsteroid.MAX_TYPE)
+		'_tmpBigAsteroid.SetType(Rnd(0, BigAsteroid.MAX_TYPE))
+		_tmpBigAsteroid.Revive()		
 	End Method
 	
 End Class
