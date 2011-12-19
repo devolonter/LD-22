@@ -1,8 +1,10 @@
 Strict
 
 Import flixel
+Import flixel.flxtext.driver.angelfont
+Import src.alonegame
 
-Class ProgressBar extends FlxSprite
+Class ProgressBar extends FlxGroup
 
 	Const MIN_VALUE:Int = 0
 	Const MAX_VALUE:Float = 1
@@ -11,9 +13,17 @@ Class ProgressBar extends FlxSprite
 	
 	Field value:Float
 	Field color:FlxColor
-	Field border:Int = 2 
+	Field border:Int = 2
+	Field width:Float
+	Field height:Float
+	Field x:Float
+	Field y:Float
 	
-	Method New(x:Float, y:Float, color:Int)
+Private
+	Field _title:FlxText
+	
+Public
+	Method New(x:Float, y:Float, title:String, color:Int)
 		width = WIDTH
 		height = HEIGHT
 		
@@ -22,10 +32,16 @@ Class ProgressBar extends FlxSprite
 		
 		value = MAX_VALUE
 		
-		Self.color = New FlxColor(color)	
+		Self.color = New FlxColor(color)
+		
+		_title = New FlxText(x, y - HEIGHT, WIDTH, title, New FlxTextAngelFontDriver())
+		_title.SetFormat(AloneGame.FONT_ORBITRON, 16, color)
+		Add(_title)
 	End Method
 	
 	Method Draw:Void()
+		Super.Draw()
+	
 		SetColor(color.r, color.g, color.b)
 		DrawRect(x, y, width, height)
 		SetColor(0, 0, 0)

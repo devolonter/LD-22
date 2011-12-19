@@ -103,13 +103,13 @@ Public
 		
 		_collisionsBound = New FlxRect(0, _cameraBound.y - astronaut.width / 2, FlxG.DEVICE_WIDTH, astronaut.width)
 		
-		oxygen = New ProgressBar(10, FlxG.DEVICE_HEIGHT - 30, AloneGame.OXYGEN_COLOR)
+		oxygen = New ProgressBar(10, FlxG.DEVICE_HEIGHT - 30, "OXYGEN", AloneGame.OXYGEN_COLOR)
 		Add(oxygen)
 		
-		health = New ProgressBar(FlxG.DEVICE_WIDTH / 2 - ProgressBar.WIDTH / 2, FlxG.DEVICE_HEIGHT - 30, AloneGame.HEALTH_COLOR)
+		health = New ProgressBar(FlxG.DEVICE_WIDTH / 2 - ProgressBar.WIDTH / 2, FlxG.DEVICE_HEIGHT - 30, "HEALTH", AloneGame.HEALTH_COLOR)
 		Add(health)
 		
-		nitro = New ProgressBar(FlxG.DEVICE_WIDTH - ProgressBar.WIDTH - 10, FlxG.DEVICE_HEIGHT - 30, AloneGame.NITRO_COLOR)
+		nitro = New ProgressBar(FlxG.DEVICE_WIDTH - ProgressBar.WIDTH - 10, FlxG.DEVICE_HEIGHT - 30, "NITRO", AloneGame.NITRO_COLOR)
 		nitro.value = 0
 		Add(nitro)
 		
@@ -200,7 +200,7 @@ Public
 						End if						
 						
 						If (Not _tmpBigAsteroid.collided) Then
-							FlxG.camera.Flash($77FF0000, 0.5)
+							FlxG.camera.Flash($77FF0000, 0.5, Null, True)
 							astronaut.health -= ASTEROID_DAMAGE
 							PlaySound(_asteroidSound, ASTEROID_CHANNEL)	
 						End If
