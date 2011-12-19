@@ -12,12 +12,13 @@ Class PlayState Extends FlxState
 
 	Global CLASS_OBJECT:FlxClass = New PlayStateClass()
 	
-	Const SPACESHIP_SPEED:Float = 5
+	Const SPACESHIP_SPEED:Float = Astronaut.MAX_ACCELERATE + 3
 	Const PIXELS_PER_KM:Int = 20
-	Const NITRO_PERIOD:Float = 2
+	Const NITRO_PERIOD:Float = Astronaut.NITRO_CONSUMPTION - 1
 	Const NITRO_NEEDED_SPEED:Float = Astronaut.MAX_ACCELERATE - 1
-	Const ASTEROIDS_PERIOD:Float = 1
-	Const ASTEROID_NEEDED_SPEED:Float = Astronaut.MAX_ACCELERATE - 1	
+	Const ASTEROIDS_PERIOD:Float = 3
+	Const ASTEROID_NEEDED_SPEED:Float = Astronaut.MAX_ACCELERATE - 1
+	Const START_DISTANCE:Float = 1000	
 	
 	Field astronaut:Astronaut
 	Field gas:ProgressBar
@@ -69,7 +70,7 @@ Public
 		_bigAsteroids = New FlxGroup()
 		Add(_bigAsteroids)
 		
-		_GenerateBigAsteroid(Rnd(_cameraBound.Left, _cameraBound.Right), -200)		
+		_GenerateBigAsteroid()		
 		
 		astronaut = New Astronaut()
 		Add(astronaut)
@@ -86,7 +87,7 @@ Public
 		nitro.value = 0
 		Add(nitro)
 		
-		_spaceshipDistancePassed = 50000
+		_spaceshipDistancePassed = START_DISTANCE
 	End Method
 	
 	Method Update:Void()
@@ -96,7 +97,7 @@ Public
 		gas.value = astronaut.gas
 		nitro.value = astronaut.nitro		
 		
-		_distancePassed += astronaut.speed.y / PIXELS_PER_KM
+		_distancePassed -= astronaut.speed.y / PIXELS_PER_KM
 		_spaceshipDistancePassed += SPACESHIP_SPEED / PIXELS_PER_KM
 				
 		_bgScroll -= astronaut.speed.y*.3
@@ -165,7 +166,7 @@ Public
 				
 		If (_gameStarted And _elapsedNitroTime <= 0) Then
 			If (Abs(astronaut.speed.y) > NITRO_NEEDED_SPEED) Then
-				_GenerateCylinder(Rnd(_cameraBound.Left, _cameraBound.Right), -100, Cylinder.TYPE_NITRO)				
+				_GenerateCylinder(Rnd(_cameraBound.Left, _cameraBound.Right), Rnd(-10, -50), Cylinder.TYPE_NITRO)				
 			End If
 			
 			_elapsedNitroTime = NITRO_PERIOD
@@ -175,13 +176,14 @@ Public
 		
 		If (_gameStarted And _elpasedBigAsteroidTime <= 0) Then
 			If (Abs(astronaut.speed.y) > ASTEROID_NEEDED_SPEED) Then
-				_GenerateBigAsteroid(Rnd(_cameraBound.Left, _cameraBound.Right), -100)				
+				_GenerateBigAsteroid()				
 			End If
 		
-			_elpasedBigAsteroidTime = ASTEROIDS_PERIOD
+			_elpasedBigAsteroidTime = ASTEROIDS_PERIOD - (Abs(astronaut.speed.y) / 7) - (START_DISTANCE / (_spaceshipDistancePassed - _distancePassed))*.1
+			_elpasedBigAsteroidTime = Max(_elpasedBigAsteroidTime, .5) 
 		End If
 		
-		distance.Text = "Distance: " + Ceil(_spaceshipDistancePassed + _distancePassed)  + " km"
+		distance.Text = "Distance: " + Ceil(_spaceshipDistancePassed - _distancePassed)  + " km"
 		
 		If (astronaut.speed.y <> 0) Then
 			FlxG.camera.Shake(-astronaut.speed.y / 3000, 0.1)
@@ -208,9 +210,9 @@ Private
 		_tmpCylinder.Revive()
 	End Method
 	
-	Method _GenerateBigAsteroid:Void(x:Float, y:Float)
+	Method _GenerateBigAsteroid:Void()	
 		_tmpBigAsteroid = BigAsteroid(_bigAsteroids.Recycle(BigAsteroid.CLASS_OBJECT))
-		_tmpBigAsteroid.SetPos(x, y)
+		_tmpBigAsteroid.SetPos(Rnd(_cameraBound.Left, _cameraBound.Right), Rnd(-300, -400))
 		_tmpBigAsteroid.SetType(Rnd(0, BigAsteroid.MAX_TYPE))
 		_tmpBigAsteroid.Revive()
 		_elpasedBigAsteroidTime = ASTEROIDS_PERIOD
