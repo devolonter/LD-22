@@ -69,8 +69,7 @@ Public
 		_bigAsteroids = New FlxGroup()
 		Add(_bigAsteroids)
 		
-		_GenerateBigAsteroid(Rnd(_cameraBound.Left, _cameraBound.Right), -200)
-		_elpasedBigAsteroidTime = ASTEROIDS_PERIOD		
+		_GenerateBigAsteroid(Rnd(_cameraBound.Left, _cameraBound.Right), -200)		
 		
 		astronaut = New Astronaut()
 		Add(astronaut)
@@ -136,6 +135,26 @@ Public
 			If (_tmpBigAsteroid <> Null And _tmpBigAsteroid.alive) Then
 				_tmpBigAsteroid.y -= astronaut.speed.y
 				
+				If (_tmpBigAsteroid.y + _tmpBigAsteroid.height > _collisionsBound.Top And _tmpBigAsteroid.y < _collisionsBound.Bottom) Then
+					If (Collision.PolyToPoly(astronaut.GetCollisionMask(), _tmpBigAsteroid.GetCollisionMask())) Then
+						If (astronaut.x > _tmpBigAsteroid.x + _tmpBigAsteroid.width / 2) Then
+							If (_cameraBound.Right - (_tmpBigAsteroid.x + _tmpBigAsteroid.width) > astronaut.height) Then
+								astronaut.x += astronaut.accelerate
+							Else
+								astronaut.x -= astronaut.accelerate
+							End If
+						Else
+							If (_tmpBigAsteroid.x - _cameraBound.Left > astronaut.height) Then
+								astronaut.x -= astronaut.accelerate
+							Else
+								astronaut.y += astronaut.accelerate	
+							End If
+						End if
+						
+						FlxG.camera.Flash($77FF0000, 0.5)
+					End If						
+				End If
+				
 				If (_tmpBigAsteroid.y > FlxG.DEVICE_HEIGHT) Then
 					_tmpBigAsteroid.Kill()
 					_gameStarted = True	
@@ -192,9 +211,11 @@ Private
 	Method _GenerateBigAsteroid:Void(x:Float, y:Float)
 		_tmpBigAsteroid = BigAsteroid(_bigAsteroids.Recycle(BigAsteroid.CLASS_OBJECT))
 		_tmpBigAsteroid.SetPos(x, y)
-		_tmpBigAsteroid.SetType(BigAsteroid.MAX_TYPE)
-		'_tmpBigAsteroid.SetType(Rnd(0, BigAsteroid.MAX_TYPE))
-		_tmpBigAsteroid.Revive()		
+		_tmpBigAsteroid.SetType(Rnd(0, BigAsteroid.MAX_TYPE))
+		_tmpBigAsteroid.Revive()
+		_elpasedBigAsteroidTime = ASTEROIDS_PERIOD
+		
+		If (Not _gameStarted) _tmpBigAsteroid.Kill()	
 	End Method
 	
 End Class

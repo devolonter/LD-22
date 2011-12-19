@@ -34,10 +34,12 @@ Class BigAsteroid Extends Asteroid
 			collisionsMasks[4] = [0.0, 49.0, 7.0, 25.0, 25.0, 6.0, 70.0, 0.0, 90.0, 3.0, 139.0, 28.0, 170.0, 55.0, 174.0, 77.0, 168.0, 97.0, 136.0, 118.0, 90.0, 107.0, 49.0, 103.0, 20.0, 85.0, 3.0, 65.0]
 	
 			collisionsMasks[5] = [0.0, 87.0, 7.0, 58.0, 21.0, 23.0, 33.0, 5.0, 47.0, 0.0, 65.0, 6.0, 77.0, 20.0, 78.0, 31.0, 70.0, 56.0, 69.0, 89.0, 59.0, 106.0, 37.0, 117.0, 18.0, 113.0, 2.0, 97.0]
-		End if
+		End if		
 		
 		SetType(Rnd(0, MAX_TYPE))
-		SetPos(x, y)					
+		SetPos(x, y)
+		width = _sprite.Width()
+		height = _sprite.Height()					
 	End Method
 	
 	Method SetType:Void(type:Int)

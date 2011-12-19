@@ -18,7 +18,15 @@ Private
 	
 Public
 	Method New(x:Float = 0, y:Float = 0, type:Int = TYPE_NITRO)
-		If (cylindersSprites = Null) Then
+		#If CONFIG = "debug"
+			Print "New instance of cylinder"
+		#End
+	
+		If (cylindersSprites = Null) Then		
+			#If CONFIG = "debug"
+				Print "Cylinder images load"
+			#End
+		
 			cylindersSprites = LoadImage("gfx/cylinders.png", TYPE_NITRO + 1)
 		End If
 		

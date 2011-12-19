@@ -1,6 +1,7 @@
 Strict
 
 Import flixel
+Import src.collisions
 
 Class Asteroid Extends FlxSprite
 

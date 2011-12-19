@@ -39,7 +39,15 @@ Private
 	
 Public	
 	Method New()
+		#If CONFIG = "debug"
+			Print "New instance of astronaut"
+		#End
+	
 		If (astronautSprite = Null) Then
+			#If CONFIG = "debug"
+				Print "Astronaut images load"
+			#End
+		
 			astronautSprite = LoadImage("gfx/astronaut.png", 1, Image.MidHandle)
 			gasSprite = LoadImage("gfx/gas.png", 1, Image.MidHandle)
 		End if
