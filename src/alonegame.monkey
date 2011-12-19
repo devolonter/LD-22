@@ -1,8 +1,7 @@
 Strict
 
 Import flixel
-Import src.playstate
-'Import src.titlestate
+Import src.titlestate
 
 Class AloneGame Extends FlxGame	
 
@@ -25,7 +24,7 @@ Class AloneGame Extends FlxGame
 	
 Public
 	Method New()
-		Super.New(800, 600, PlayState.CLASS_OBJECT)
+		Super.New(800, 600, TitleState.CLASS_OBJECT)
 	End Method
 	
 	Method OnContentInit:Void()	

@@ -65,6 +65,7 @@ Public
 		
 		_jetpackSound = jetpackSound
 		_jetpackNitroSound = jetpackNitroSound
+		SetChannelVolume(PlayState.NITRO_CHANNEL, .9)
 		
 		x = (FlxG.DEVICE_WIDTH / 2)
 		y = (FlxG.DEVICE_HEIGHT - 150)

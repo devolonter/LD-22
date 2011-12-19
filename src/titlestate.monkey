@@ -23,7 +23,7 @@ Private
 		_bg = AloneGame.GetBgSprite()
 		
 		_title = New FlxText(40,  FlxG.DEVICE_HEIGHT / 2, FlxG.DEVICE_WIDTH - 80, AloneGame.NAME, New FlxTextAngelFontDriver())
-		_title.SetFormat(AloneGame.FONT_TECHNIQUE, 48, $ffd82519)
+		_title.SetFormat(AloneGame.FONT_TECHNIQUE, 48, AloneGame.OXYGEN_COLOR)
 		Add(_title)
 		
 		_subTitle = New FlxText(300,  FlxG.DEVICE_HEIGHT / 2 + 60, 400, AloneGame.TITLE, New FlxTextAngelFontDriver())

@@ -25,7 +25,7 @@ Private
 	
 	Method Create:Void()		
 		_title = New FlxText(40,  30, FlxG.DEVICE_WIDTH - 80, AloneGame.GAME_OVER, New FlxTextAngelFontDriver())
-		_title.SetFormat(AloneGame.FONT_TECHNIQUE, 48, $ffd82519, FlxText.ALIGN_CENTER)
+		_title.SetFormat(AloneGame.FONT_TECHNIQUE, 48,  AloneGame.HEALTH_COLOR, FlxText.ALIGN_CENTER)
 		Add(_title)
 		
 		_distanceText = New FlxText(20,  150, FlxG.DEVICE_WIDTH - 40, _distance + AloneGame.KM_LEFT, New FlxTextAngelFontDriver())
@@ -44,7 +44,7 @@ Private
 				_reasonText.SetFormat(AloneGame.FONT_ORBITRON, 24, AloneGame.HEALTH_COLOR, FlxText.ALIGN_CENTER)	
 		End Select
 		
-		_tip = New FlxText(40,  FlxG.DEVICE_HEIGHT - 50, FlxG.DEVICE_WIDTH - 80, AloneGame.GAME_OVER_TIP, New FlxTextAngelFontDriver())
+		_tip = New FlxText(40,  FlxG.DEVICE_HEIGHT - 70, FlxG.DEVICE_WIDTH - 80, AloneGame.GAME_OVER_TIP, New FlxTextAngelFontDriver())
 		_tip.SetFormat(AloneGame.FONT_ORBITRON, 24, FlxG.WHITE, FlxText.ALIGN_CENTER)
 		Add(_tip)
 		
@@ -56,7 +56,7 @@ Private
 		Super.Update()
 	
 		If (KeyHit(KEY_ENTER)) Then
-			FlxG.SwitchState(New PlayState())
+			FlxG.SwitchState(New PlayState(PlayState.FROM_GAME_OVER))
 		End If
 	End Method
 	
@@ -71,7 +71,6 @@ Private
 
 		_astroCorpse.Discard()
 		_astroCorpse = Null
-		StopMusic()
 	End Method
 
 End Class

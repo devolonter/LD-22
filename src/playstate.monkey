@@ -7,6 +7,7 @@ Import src.progressbar
 Import src.alonegame
 Import src.cylinder
 Import src.bigasteroid
+Import src.gameoverstate
 
 Class PlayState Extends FlxState
 
@@ -25,6 +26,8 @@ Class PlayState Extends FlxState
 	Const NITRO_CHANNEL:Int = 1
 	Const CYLINDER_CHANNEL:Int = 2
 	Const ASTEROID_CHANNEL:Int = 3
+	
+	Const FROM_GAME_OVER:Int = 1
 	
 	Field astronaut:Astronaut
 	Field health:ProgressBar
@@ -57,7 +60,13 @@ Private
 	
 	Field _captionDistance:FlxText
 	
-Public	
+	Field _from:Int
+	
+Public
+	Method New(from:Int)
+		_from = from
+	End Method
+	
 	Method Create:Void()	
 		_cameraBound = New FlxRect(100, 450, 600, 0)
 
@@ -110,7 +119,9 @@ Public
 		
 		_spaceshipDistancePassed = START_DISTANCE
 		
-		PlayMusic("sfx/main_theme.mp3")
+		If (_from <> FROM_GAME_OVER) Then
+			PlayMusic("sfx/main_theme.mp3")
+		End If		
 		SetMusicVolume(.8)
 	End Method
 	
@@ -219,6 +230,14 @@ Public
 		
 		If (astronaut.speed.y <> 0) Then
 			FlxG.camera.Shake(-astronaut.speed.y / 3000, 0.1)
+		End If
+		
+		If (astronaut.oxygen <= .01) Then
+			FlxG.SwitchState(New GameOverState(distance.Text, 0))
+		End If
+		
+		If (astronaut.health <= .05) Then
+			FlxG.SwitchState(New GameOverState(distance.Text, 1))
 		End If
 	End Method
 	
