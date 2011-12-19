@@ -51,6 +51,12 @@ Private
 		If (KeyHit(KEY_ENTER)) Then
 			FlxG.SwitchState(New PlayState())
 		End If
+		
+		#If TARGET <> "flash" And TARGET <> "html5"
+			If (KeyHit(KEY_ESCAPE)) Then
+				Error ""
+			End If
+		#End
 	End Method
 	
 	Method Draw:Void()

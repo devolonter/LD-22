@@ -15,9 +15,11 @@ Class AloneGame Extends FlxGame
 	Const TITLE_TIP:String = "PRESS ENTER TO START"
 	Const GAME_OVER_TIP:String = "PRESS ENTER TO RESTART"
 	Const GAME_OVER:String = "GAME OVER"
-	Const KM_LEFT:String = " KM LEFT TO REACH YOUR SPACESHIP"
+	Const KM_LEFT:String = " LEFT TO REACH YOUR SPACESHIP"
 	Const OXYGEN_OVER:String = "YOUR OXYGEN IS OVER"
 	Const HEALTH_OVER:String = "YOUR INJURIES ARE INCOMPATIBLE WITH LIFE"
+	Const YOU_WIN:String = "YOU WIN!"
+	Const WIN_TIP:String = "PRESS ENTER TO GO TITLE SCREEN"
 	
 	Const FONT_ORBITRON:String = "orbitron"
 	Const FONT_TECHNIQUE:String = "technique"

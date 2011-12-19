@@ -62,6 +62,10 @@ Private
 	
 	Field _from:Int
 	
+	Field _isWin:Bool
+	Field _winTitle:FlxText
+	Field _winTip:FlxText
+	
 Public
 	Method New(from:Int)
 		_from = from
@@ -117,6 +121,16 @@ Public
 		_captionDistance.SetFormat(AloneGame.FONT_ORBITRON, 24, FlxG.WHITE)
 		Add(_captionDistance)
 		
+		_winTitle = New FlxText(40,  FlxG.DEVICE_HEIGHT / 2 - 100, FlxG.DEVICE_WIDTH - 80, AloneGame.YOU_WIN, New FlxTextAngelFontDriver())
+		_winTitle.SetFormat(AloneGame.FONT_TECHNIQUE, 48,  AloneGame.OXYGEN_COLOR, FlxText.ALIGN_CENTER)
+		_winTitle.visible = False
+		Add(_winTitle)
+		
+		_winTip = New FlxText(40,  FlxG.DEVICE_HEIGHT / 2 - 25, FlxG.DEVICE_WIDTH - 80, AloneGame.WIN_TIP, New FlxTextAngelFontDriver())
+		_winTip.SetFormat(AloneGame.FONT_ORBITRON, 24,  FlxG.WHITE, FlxText.ALIGN_CENTER)
+		_winTip.visible = False
+		Add(_winTip)
+		
 		_spaceshipDistancePassed = START_DISTANCE
 		
 		If (_from <> FROM_GAME_OVER) Then
@@ -124,7 +138,7 @@ Public
 		End If		
 		SetMusicVolume(.8)
 	End Method
-	
+		
 	Method Update:Void()
 		Super.Update()				
 		
@@ -202,24 +216,35 @@ Public
 			End If
 				
 		Next
+		
+		If (Not _isWin) Then		
+			If (_gameStarted And _elapsedNitroTime <= 0) Then
+				If (Abs(astronaut.speed.y) > NITRO_NEEDED_SPEED) Then
+					_GenerateCylinder(Rnd(_cameraBound.Left, _cameraBound.Right), Rnd(-10, -50), Cylinder.TYPE_NITRO)				
+				End If
 				
-		If (_gameStarted And _elapsedNitroTime <= 0) Then
-			If (Abs(astronaut.speed.y) > NITRO_NEEDED_SPEED) Then
-				_GenerateCylinder(Rnd(_cameraBound.Left, _cameraBound.Right), Rnd(-10, -50), Cylinder.TYPE_NITRO)				
+				_elapsedNitroTime = NITRO_PERIOD
 			End If
 			
-			_elapsedNitroTime = NITRO_PERIOD
-		End If
-		
-		_elpasedBigAsteroidTime -= FlxG.elapsed
-		
-		If (_gameStarted And _elpasedBigAsteroidTime <= 0) Then
-			If (Abs(astronaut.speed.y) > ASTEROID_NEEDED_SPEED) Then
-				_GenerateBigAsteroid()				
+			_elpasedBigAsteroidTime -= FlxG.elapsed
+			
+			If (_gameStarted And _elpasedBigAsteroidTime <= 0) Then
+				If (Abs(astronaut.speed.y) > ASTEROID_NEEDED_SPEED) Then
+					_GenerateBigAsteroid()				
+				End If
+			
+				_elpasedBigAsteroidTime = ASTEROIDS_PERIOD + (astronaut.speed.y / 7) - (START_DISTANCE / (_spaceshipDistancePassed - _distancePassed))*.1
+				_elpasedBigAsteroidTime = Max(_elpasedBigAsteroidTime, .5) 
 			End If
-		
-			_elpasedBigAsteroidTime = ASTEROIDS_PERIOD + (astronaut.speed.y / 7) - (START_DISTANCE / (_spaceshipDistancePassed - _distancePassed))*.1
-			_elpasedBigAsteroidTime = Max(_elpasedBigAsteroidTime, .5) 
+		Else
+			astronaut.nitro = 0
+			astronaut.health = ProgressBar.MAX_VALUE
+			astronaut.oxygen = ProgressBar.MAX_VALUE
+			astronaut.accelerate = Astronaut.MAX_ACCELERATE / 2
+			
+			If (KeyDown(KEY_ENTER)) Then
+				FlxG.SwitchState(New TitleState())		
+			End If
 		End If
 		
 		oxygen.value = astronaut.oxygen
@@ -239,6 +264,20 @@ Public
 		If (astronaut.health <= .05) Then
 			FlxG.SwitchState(New GameOverState(distance.Text, 1))
 		End If
+		
+		If (Ceil(_spaceshipDistancePassed - _distancePassed) <= 0 And Not _isWin) Then
+			_isWin = True
+			oxygen.visible = False
+			health.visible = False
+			nitro.visible = False
+			distance.visible = False
+			_captionDistance.visible = False
+			_bigAsteroids.Kill()
+			_cylinders.Kill()
+			
+			_winTitle.visible = True
+			_winTip.visible = True
+		End If
 	End Method
 	
 	Method Draw:Void()		
@@ -251,6 +290,17 @@ Public
 		#End
 
 		Super.Draw()		
+	End Method
+	
+	Method Destroy:Void()
+		Super.Destroy()
+	
+		_bg[0] = Null
+		_bg[1] = Null
+		_bg[2] = Null
+		
+		StopChannel(JETPACK_CHANNEL)
+		StopChannel(NITRO_CHANNEL)
 	End Method
 
 Private	
