@@ -22,6 +22,9 @@ Class PlayState Extends FlxState
 	Const ASTEROID_DAMAGE:Float = .1
 	
 	Const JETPACK_CHANNEL:Int = 0
+	Const NITRO_CHANNEL:Int = 1
+	Const CYLINDER_CHANNEL:Int = 2
+	Const ASTEROID_CHANNEL:Int = 3
 	
 	Field astronaut:Astronaut
 	Field health:ProgressBar
@@ -49,6 +52,9 @@ Private
 	
 	Field _gameStarted:Bool = False
 	
+	Field _cylinderSound:Sound
+	Field _asteroidSound:Sound
+	
 Public	
 	Method Create:Void()	
 		_cameraBound = New FlxRect(100, 450, 600, 0)
@@ -59,7 +65,17 @@ Public
 		
 		_bg[0] = bgSprite
 		_bg[1] = bgSprite
-		_bg[2] = bgSprite			
+		_bg[2] = bgSprite
+		
+		If (cylinderSound = Null) Then
+			cylinderSound = LoadSound("sfx/get_cylinder.mp3")
+			asteroidSound = LoadSound("sfx/asteroid_hit.mp3")			
+		End If
+		
+		_cylinderSound = cylinderSound
+		SetChannelVolume(CYLINDER_CHANNEL, .4)
+		
+		_asteroidSound = asteroidSound
 		
 		distance = New FlxText(10, 10, FlxG.DEVICE_WIDTH - 20, "", New FlxTextAngelFontDriver())
 		distance.SetFormat("orbitrton", 28, FlxG.WHITE, FlxText.ALIGN_RIGHT)
@@ -93,6 +109,7 @@ Public
 		_spaceshipDistancePassed = START_DISTANCE
 		
 		PlayMusic("sfx/main_theme.mp3")
+		SetMusicVolume(.7)
 	End Method
 	
 	Method Update:Void()
@@ -117,7 +134,9 @@ Public
 						_tmpCylinder.Kill()
 						astronaut.nitro = ProgressBar.MAX_VALUE
 						_elapsedNitroTime = NITRO_PERIOD
-						_gameStarted = True	
+						_gameStarted = True
+						_elpasedBigAsteroidTime = 0
+						PlaySound(_cylinderSound, CYLINDER_CHANNEL)	
 					End If
 				End If
 				
@@ -155,10 +174,11 @@ Public
 						
 						If (Not _tmpBigAsteroid.collided) Then
 							FlxG.camera.Flash($77FF0000, 0.5)
-							astronaut.health -= ASTEROID_DAMAGE	
+							astronaut.health -= ASTEROID_DAMAGE
+							PlaySound(_asteroidSound, ASTEROID_CHANNEL)	
 						End If
 						
-						_tmpBigAsteroid.collided = True
+						_tmpBigAsteroid.collided = True						
 					End If						
 				End If
 				
@@ -185,7 +205,7 @@ Public
 				_GenerateBigAsteroid()				
 			End If
 		
-			_elpasedBigAsteroidTime = ASTEROIDS_PERIOD - (Abs(astronaut.speed.y) / 7) - (START_DISTANCE / (_spaceshipDistancePassed - _distancePassed))*.1
+			_elpasedBigAsteroidTime = ASTEROIDS_PERIOD + (astronaut.speed.y / 7) - (START_DISTANCE / (_spaceshipDistancePassed - _distancePassed))*.1
 			_elpasedBigAsteroidTime = Max(_elpasedBigAsteroidTime, .5) 
 		End If
 		
@@ -248,3 +268,5 @@ End Class
 
 Private
 	Global bgSprite:Image
+	Global cylinderSound:Sound
+	Global asteroidSound:Sound

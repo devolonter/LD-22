@@ -9,7 +9,7 @@ Class Astronaut Extends FlxSprite
 
 	Const SENSITIVITY:Float = 2
 	Const MAX_ACCELERATE:Float = 5
-	Const NITRO_ACCELERATE:Float = 10
+	Const NITRO_ACCELERATE:Float = 15
 	Const FRICTION:Float = 0.03
 	Const MAX_ANGLE:Float = 130
 	Const MIN_ANGLE:Float = 50
@@ -17,7 +17,7 @@ Class Astronaut Extends FlxSprite
 	'Чем меньше чем больше расход
 	Const NITRO_CONSUMPTION:Float = 5
 	Const GAS_CONSUMPTION:Float = 50
-	Const OXYGEN_CONSUMPTION:Float = 150
+	Const OXYGEN_CONSUMPTION:Float = 50
 
 	Field angle:Float
 	Field accelerate:Float
@@ -60,7 +60,7 @@ Public
 		
 		If (jetpackSound = Null) Then
 			jetpackSound = LoadSound("sfx/jetpack.mp3")
-			jetpackNitroSound = LoadSound("sfx/jetpacknitro.mp3")	
+			jetpackNitroSound = LoadSound("sfx/jetpack_nitro.mp3")	
 		End If
 		
 		_jetpackSound = jetpackSound
@@ -99,11 +99,8 @@ Public
 				PlaySound(_jetpackSound, PlayState.JETPACK_CHANNEL, 1)
 				_jetpackSoundPlaying = True
 			End If
-		Else
-			If (nitro <= 0) Then
-				StopChannel(PlayState.JETPACK_CHANNEL)
-			End If
-			
+		Else				
+			StopChannel(PlayState.JETPACK_CHANNEL)		
 			_jetpackSoundPlaying = False
 			gasAccelerate = 0
 			_gasForce = 0
@@ -113,11 +110,12 @@ Public
 			nitroAccelerate = NITRO_ACCELERATE
 			
 			If (nitro = 1) Then
-				PlaySound(_jetpackNitroSound, PlayState.JETPACK_CHANNEL)	
+				PlaySound(_jetpackNitroSound, PlayState.NITRO_CHANNEL)	
 			End If
 			
 			nitro = Max(nitro - FlxG.elapsed / NITRO_CONSUMPTION, 0.0)
-		Else	
+		Else
+			StopChannel(PlayState.NITRO_CHANNEL)			
 			nitroAccelerate = 0	
 		End If
 		
