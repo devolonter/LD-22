@@ -1,16 +1,26 @@
 Strict
 
 Import flixel
-Import playstate
+'Import src.playstate
+Import src.titlestate
 
-Class AloneGame Extends FlxGame
+Class AloneGame Extends FlxGame	
 
 	Const OXYGEN_COLOR:Int = $ff0097ff
 	Const GAS_COLOR:Int = $ffbe0000
 	Const NITRO_COLOR:Int = $ff62be00
-
+	
+	Const NAME:String = "STAND ALONE"
+	Const TITLE:String = "REACH YOUR SPACESHIP"
+	Const COPYRIGHT:String = "BY DEVOLONTER & AHNINNIAH"
+	Const TITLE_TIP:String = "PRESS ENTER TO START"
+	
+	Const FONT_ORBITRON:String = "orbitron"
+	Const FONT_TECHNIQUE:String = "technique"
+	
+Public
 	Method New()
-		Super.New(800, 600, PlayState.CLASS_OBJECT)
+		Super.New(800, 600, TitleState.CLASS_OBJECT)
 	End Method
 	
 	Method OnContentInit:Void()	
@@ -23,8 +33,27 @@ Class AloneGame Extends FlxGame
 			system.SetPath(i, "fonts/" + FlxText.SYSTEM_FONT + "/angelfont/"+i+".txt")	
 		Next
 	
-		Local orbitron:FlxFont = FlxAssetsManager.AddFont("orbitrton", FlxText.DRIVER_ANGELFONT)		
+		Local orbitron:FlxFont = FlxAssetsManager.AddFont(FONT_ORBITRON, FlxText.DRIVER_ANGELFONT)		
 		orbitron.SetPath(28, "fonts/orbitron_28.txt")
+		orbitron.SetPath(24, "fonts/orbitron_24.txt")
+		orbitron.SetPath(16, "fonts/orbitron_16.txt")
+		
+		Local technique:FlxFont = FlxAssetsManager.AddFont(FONT_TECHNIQUE, FlxText.DRIVER_ANGELFONT)
+		technique.SetPath(48, "fonts/technique_48.txt")		
 	End Method
 	
+	Function GetBgSprite:Image()
+		If (bgSprite = Null) Then
+			#If CONFIG="debug"
+				Print "Background image loaded"
+			#End
+			bgSprite = LoadImage("gfx/bg.jpg")
+		Endif
+		
+		Return bgSprite
+	End Function
+	
 End Class
+
+Private
+	Global bgSprite:Image

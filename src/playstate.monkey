@@ -55,17 +55,15 @@ Private
 	Field _cylinderSound:Sound
 	Field _asteroidSound:Sound
 	
+	Field _captionDistance:FlxText
+	
 Public	
 	Method Create:Void()	
 		_cameraBound = New FlxRect(100, 450, 600, 0)
-	
-		If (bgSprite = Null) Then
-			bgSprite = LoadImage("gfx/bg.jpg")
-		Endif
-		
-		_bg[0] = bgSprite
-		_bg[1] = bgSprite
-		_bg[2] = bgSprite
+
+		_bg[0] = AloneGame.GetBgSprite()
+		_bg[1] = AloneGame.GetBgSprite()
+		_bg[2] = AloneGame.GetBgSprite()
 		
 		If (cylinderSound = Null) Then
 			cylinderSound = LoadSound("sfx/get_cylinder.mp3")
@@ -75,11 +73,7 @@ Public
 		_cylinderSound = cylinderSound
 		SetChannelVolume(CYLINDER_CHANNEL, .4)
 		
-		_asteroidSound = asteroidSound
-		
-		distance = New FlxText(10, 10, FlxG.DEVICE_WIDTH - 20, "", New FlxTextAngelFontDriver())
-		distance.SetFormat("orbitrton", 28, FlxG.WHITE, FlxText.ALIGN_RIGHT)
-		Add(distance)
+		_asteroidSound = asteroidSound		
 		
 		_cylinders = New FlxGroup()
 		Add(_cylinders)
@@ -106,10 +100,18 @@ Public
 		nitro.value = 0
 		Add(nitro)
 		
+		distance = New FlxText(10, 10, FlxG.DEVICE_WIDTH - 20, "", New FlxTextAngelFontDriver())
+		distance.SetFormat(AloneGame.FONT_ORBITRON, 24, FlxG.WHITE, FlxText.ALIGN_RIGHT)
+		Add(distance)
+		
+		_captionDistance = New FlxText(10, 10, FlxG.DEVICE_WIDTH - 20, "DISTANCE", New FlxTextAngelFontDriver())
+		_captionDistance.SetFormat(AloneGame.FONT_ORBITRON, 24, FlxG.WHITE)
+		Add(_captionDistance)
+		
 		_spaceshipDistancePassed = START_DISTANCE
 		
 		PlayMusic("sfx/main_theme.mp3")
-		SetMusicVolume(.7)
+		SetMusicVolume(.8)
 	End Method
 	
 	Method Update:Void()
@@ -213,7 +215,7 @@ Public
 		health.value = astronaut.health
 		nitro.value = astronaut.nitro
 		
-		distance.Text = "Distance: " + Ceil(_spaceshipDistancePassed - _distancePassed)  + " km"
+		distance.Text = Ceil(_spaceshipDistancePassed - _distancePassed)  + " KM"
 		
 		If (astronaut.speed.y <> 0) Then
 			FlxG.camera.Shake(-astronaut.speed.y / 3000, 0.1)
@@ -304,6 +306,5 @@ Class PlayStateClass Implements FlxClass
 End Class
 
 Private
-	Global bgSprite:Image
 	Global cylinderSound:Sound
 	Global asteroidSound:Sound

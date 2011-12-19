@@ -17,7 +17,7 @@ Class Astronaut Extends FlxSprite
 	'Чем меньше чем больше расход
 	Const NITRO_CONSUMPTION:Float = 5
 	Const GAS_CONSUMPTION:Float = 50
-	Const OXYGEN_CONSUMPTION:Float = 50
+	Const OXYGEN_CONSUMPTION:Float = 80
 
 	Field angle:Float
 	Field accelerate:Float
