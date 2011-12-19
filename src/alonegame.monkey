@@ -1,26 +1,31 @@
 Strict
 
 Import flixel
-'Import src.playstate
-Import src.titlestate
+Import src.playstate
+'Import src.titlestate
 
 Class AloneGame Extends FlxGame	
 
 	Const OXYGEN_COLOR:Int = $ff0097ff
-	Const GAS_COLOR:Int = $ffbe0000
+	Const HEALTH_COLOR:Int = $ffbe0000
 	Const NITRO_COLOR:Int = $ff62be00
 	
 	Const NAME:String = "STAND ALONE"
 	Const TITLE:String = "REACH YOUR SPACESHIP"
 	Const COPYRIGHT:String = "BY DEVOLONTER & AHNINNIAH"
 	Const TITLE_TIP:String = "PRESS ENTER TO START"
+	Const GAME_OVER_TIP:String = "PRESS ENTER TO RESTART"
+	Const GAME_OVER:String = "GAME OVER"
+	Const KM_LEFT:String = " KM LEFT TO REACH YOUR SPACESHIP"
+	Const OXYGEN_OVER:String = "YOUR OXYGEN IS OVER"
+	Const HEALTH_OVER:String = "YOUR INJURIES ARE INCOMPATIBLE WITH LIFE"
 	
 	Const FONT_ORBITRON:String = "orbitron"
 	Const FONT_TECHNIQUE:String = "technique"
 	
 Public
 	Method New()
-		Super.New(800, 600, TitleState.CLASS_OBJECT)
+		Super.New(800, 600, PlayState.CLASS_OBJECT)
 	End Method
 	
 	Method OnContentInit:Void()	
