@@ -19,9 +19,12 @@ Class PlayState Extends FlxState
 	Const ASTEROIDS_PERIOD:Float = 3
 	Const ASTEROID_NEEDED_SPEED:Float = Astronaut.MAX_ACCELERATE - 1
 	Const START_DISTANCE:Float = 1000	
+	Const ASTEROID_DAMAGE:Float = .1
+	
+	Const JETPACK_CHANNEL:Int = 0
 	
 	Field astronaut:Astronaut
-	Field gas:ProgressBar
+	Field health:ProgressBar
 	Field oxygen:ProgressBar
 	Field nitro:ProgressBar
 	Field distance:FlxText
@@ -80,22 +83,20 @@ Public
 		oxygen = New ProgressBar(10, FlxG.DEVICE_HEIGHT - 30, AloneGame.OXYGEN_COLOR)
 		Add(oxygen)
 		
-		gas = New ProgressBar(FlxG.DEVICE_WIDTH / 2 - ProgressBar.WIDTH / 2, FlxG.DEVICE_HEIGHT - 30, AloneGame.GAS_COLOR)
-		Add(gas)
+		health = New ProgressBar(FlxG.DEVICE_WIDTH / 2 - ProgressBar.WIDTH / 2, FlxG.DEVICE_HEIGHT - 30, AloneGame.GAS_COLOR)
+		Add(health)
 		
 		nitro = New ProgressBar(FlxG.DEVICE_WIDTH - ProgressBar.WIDTH - 10, FlxG.DEVICE_HEIGHT - 30, AloneGame.NITRO_COLOR)
 		nitro.value = 0
 		Add(nitro)
 		
 		_spaceshipDistancePassed = START_DISTANCE
+		
+		PlayMusic("sfx/main_theme.mp3")
 	End Method
 	
 	Method Update:Void()
-		Super.Update()
-		
-		oxygen.value = astronaut.oxygen
-		gas.value = astronaut.gas
-		nitro.value = astronaut.nitro		
+		Super.Update()				
 		
 		_distancePassed -= astronaut.speed.y / PIXELS_PER_KM
 		_spaceshipDistancePassed += SPACESHIP_SPEED / PIXELS_PER_KM
@@ -150,9 +151,14 @@ Public
 							Else
 								astronaut.y += astronaut.accelerate	
 							End If
-						End if
+						End if						
 						
-						FlxG.camera.Flash($77FF0000, 0.5)
+						If (Not _tmpBigAsteroid.collided) Then
+							FlxG.camera.Flash($77FF0000, 0.5)
+							astronaut.health -= ASTEROID_DAMAGE	
+						End If
+						
+						_tmpBigAsteroid.collided = True
 					End If						
 				End If
 				
@@ -183,6 +189,10 @@ Public
 			_elpasedBigAsteroidTime = Max(_elpasedBigAsteroidTime, .5) 
 		End If
 		
+		oxygen.value = astronaut.oxygen
+		health.value = astronaut.health
+		nitro.value = astronaut.nitro
+		
 		distance.Text = "Distance: " + Ceil(_spaceshipDistancePassed - _distancePassed)  + " km"
 		
 		If (astronaut.speed.y <> 0) Then
@@ -210,7 +220,9 @@ Private
 		_tmpCylinder.Revive()
 	End Method
 	
-	Method _GenerateBigAsteroid:Void()	
+	Method _GenerateBigAsteroid:Void()
+		
+		
 		_tmpBigAsteroid = BigAsteroid(_bigAsteroids.Recycle(BigAsteroid.CLASS_OBJECT))
 		_tmpBigAsteroid.SetPos(Rnd(_cameraBound.Left, _cameraBound.Right), Rnd(-300, -400))
 		_tmpBigAsteroid.SetType(Rnd(0, BigAsteroid.MAX_TYPE))

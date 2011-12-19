@@ -5,8 +5,10 @@ Import src.collisions
 
 Class Asteroid Extends FlxSprite
 
+	Field collided:Bool = False
+
 	Field _sprite:Image
-	Field _collisionsPoly:Float[]
+	Field _collisionsPoly:Float[]	
 	
 	Method SetX:Void(x:Float)
 		Self.x = x -_sprite.Width() / 2	
@@ -36,6 +38,11 @@ Class Asteroid Extends FlxSprite
 		
 	Method GetCollisionMask:Float[]()
 		Return Collision.TFormPoly(_collisionsPoly, x, y, 0, 1, 1, 0, 0)
-	End Method	
+	End Method
+	
+	Method Revive:Void()
+		Super.Revive()
+		collided = False	
+	End Method
 
 End Class
