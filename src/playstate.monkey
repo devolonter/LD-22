@@ -14,7 +14,7 @@ Class PlayState Extends FlxState
 	
 	Const SPACESHIP_SPEED:Float = Astronaut.MAX_ACCELERATE + 3
 	Const PIXELS_PER_KM:Int = 20
-	Const NITRO_PERIOD:Float = Astronaut.NITRO_CONSUMPTION - 1
+	Const NITRO_PERIOD:Float = Astronaut.NITRO_CONSUMPTION - Astronaut.NITRO_CONSUMPTION / 2
 	Const NITRO_NEEDED_SPEED:Float = Astronaut.MAX_ACCELERATE - 1
 	Const ASTEROIDS_PERIOD:Float = 3
 	Const ASTEROID_NEEDED_SPEED:Float = Astronaut.MAX_ACCELERATE - 1
@@ -84,10 +84,10 @@ Public
 		_cylinders = New FlxGroup()
 		Add(_cylinders)
 		
-		_GenerateCylinder(FlxG.DEVICE_WIDTH / 2, 200, Cylinder.TYPE_NITRO)
-		
 		_bigAsteroids = New FlxGroup()
 		Add(_bigAsteroids)
+		
+		_GenerateCylinder(FlxG.DEVICE_WIDTH / 2, 200, Cylinder.TYPE_NITRO)		
 		
 		_GenerateBigAsteroid()		
 		
@@ -234,18 +234,55 @@ Public
 
 Private	
 	Method _GenerateCylinder:Void(x:Float, y:Float, type:Int)
-		_tmpCylinder = Cylinder(_cylinders.Recycle(Cylinder.CLASS_OBJECT))
-		_tmpCylinder.SetPos(x, y)
-		_tmpCylinder.Type = type
+		_tmpCylinder = Cylinder(_cylinders.Recycle(Cylinder.CLASS_OBJECT))		
+		Local found:Bool = False
+		
+		While (Not found)
+			found = True	
+		
+			_tmpCylinder.SetPos(x, y)
+			_tmpCylinder.Type = type
+			
+			For Local bigAteroid:FlxBasic = EachIn _bigAsteroids
+				_tmpBigAsteroid = BigAsteroid(bigAteroid)
+				
+				If (_tmpBigAsteroid <> Null And _tmpBigAsteroid.alive) Then
+					If (Collision.PolyToPoly(_tmpCylinder.GetCollisionMask(), _tmpBigAsteroid.GetCollisionMask())) Then	
+						found = False
+						x = Rnd(_cameraBound.Left, _cameraBound.Right)
+						y = Rnd(-100, -400)
+						
+						Exit	
+					End If	
+				End If
+			Next				
+		Wend
+		
 		_tmpCylinder.Revive()
 	End Method
 	
-	Method _GenerateBigAsteroid:Void()
-		
-		
+	Method _GenerateBigAsteroid:Void()		
 		_tmpBigAsteroid = BigAsteroid(_bigAsteroids.Recycle(BigAsteroid.CLASS_OBJECT))
-		_tmpBigAsteroid.SetPos(Rnd(_cameraBound.Left, _cameraBound.Right), Rnd(-300, -400))
-		_tmpBigAsteroid.SetType(Rnd(0, BigAsteroid.MAX_TYPE))
+		Local found:Bool = False
+		
+		While (Not found)
+			found = True
+						
+			_tmpBigAsteroid.SetPos(Rnd(_cameraBound.Left, _cameraBound.Right), Rnd(-100, -400))
+			_tmpBigAsteroid.SetType(Rnd(0, BigAsteroid.MAX_TYPE))
+			
+			For Local cylinder:FlxBasic = EachIn _cylinders
+				_tmpCylinder = Cylinder(cylinder)
+				
+				If (_tmpCylinder <> Null And _tmpCylinder.alive) Then
+					If (Collision.PolyToPoly(_tmpBigAsteroid.GetCollisionMask(), _tmpCylinder.GetCollisionMask())) Then
+						found = False
+						Exit
+					End If
+				End If
+			Next
+		Wend
+		
 		_tmpBigAsteroid.Revive()
 		_elpasedBigAsteroidTime = ASTEROIDS_PERIOD
 		
