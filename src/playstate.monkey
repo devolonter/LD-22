@@ -66,6 +66,9 @@ Private
 	Field _winTitle:FlxText
 	Field _winTip:FlxText
 	
+	Field _isStart:Bool
+	Field _startTip:FlxText
+	
 Public
 	Method New(from:Int)
 		_from = from
@@ -94,7 +97,7 @@ Public
 		_bigAsteroids = New FlxGroup()
 		Add(_bigAsteroids)
 		
-		_GenerateCylinder(FlxG.DEVICE_WIDTH / 2, 200, Cylinder.TYPE_NITRO)		
+		_GenerateCylinder(FlxG.DEVICE_WIDTH / 2, 250, Cylinder.TYPE_NITRO)		
 		
 		_GenerateBigAsteroid()		
 		
@@ -131,15 +134,32 @@ Public
 		_winTip.visible = False
 		Add(_winTip)
 		
+		_startTip = New FlxText(40,  100, FlxG.DEVICE_WIDTH - 80, AloneGame.START_TIP, New FlxTextAngelFontDriver())
+		_startTip.SetFormat(AloneGame.FONT_ORBITRON, 24,  FlxG.WHITE, FlxText.ALIGN_CENTER)
+		_startTip.visible = False
+		Add(_startTip)
+		
 		_spaceshipDistancePassed = START_DISTANCE
 		
-		If (_from <> FROM_GAME_OVER) Then
+		If (_from <> FROM_GAME_OVER) Then			
 			PlayMusic("sfx/main_theme.mp3")
 		End If		
 		SetMusicVolume(.8)
+		
+		_isStart = True
+		_startTip.visible = True
 	End Method
 		
 	Method Update:Void()
+		If (_isStart) Then
+			If (KeyHit(KEY_SPACE)) Then
+				_isStart = False
+				_startTip.visible = False		
+			End If
+			
+			Return	
+		End If
+	
 		Super.Update()				
 		
 		_distancePassed -= astronaut.speed.y / PIXELS_PER_KM
@@ -246,7 +266,7 @@ Public
 				FlxG.SwitchState(New TitleState())		
 			End If
 		End If
-		
+
 		oxygen.value = astronaut.oxygen
 		health.value = astronaut.health
 		nitro.value = astronaut.nitro

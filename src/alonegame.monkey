@@ -20,6 +20,7 @@ Class AloneGame Extends FlxGame
 	Const HEALTH_OVER:String = "YOUR INJURIES ARE INCOMPATIBLE WITH LIFE"
 	Const YOU_WIN:String = "YOU WIN!"
 	Const WIN_TIP:String = "PRESS ENTER TO GO TITLE SCREEN"
+	Const START_TIP:String = "HOLD SPACE TO ACCELERATE"
 	
 	Const FONT_ORBITRON:String = "orbitron"
 	Const FONT_TECHNIQUE:String = "technique"
@@ -28,7 +29,7 @@ Public
 	Method New()
 		Super.New(800, 600, TitleState.CLASS_OBJECT)
 	End Method
-	
+		
 	Method OnContentInit:Void()	
 		Local minSize:Int = FlxAssetsManager.GetFont(FlxText.SYSTEM_FONT).MinSize
 		Local maxSize:Int = FlxAssetsManager.GetFont(FlxText.SYSTEM_FONT).MaxSize
