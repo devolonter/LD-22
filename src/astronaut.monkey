@@ -58,9 +58,17 @@ Public
 		_sprite	= astronautSprite
 		_gasSprite = gasSprite
 		
-		If (jetpackSound = Null) Then
-			jetpackSound = LoadSound("sfx/jetpack.mp3")
-			jetpackNitroSound = LoadSound("sfx/jetpack_nitro.mp3")	
+		If (jetpackSound = Null) Then			
+			#If TARGET = "flash"		
+				jetpackSound = LoadSound("sfx/jetpack.mp3")
+				jetpackNitroSound = LoadSound("sfx/jetpack_nitro.mp3")
+			#Elseif TARGET = "html5"
+				jetpackSound = LoadSound("sfx/jetpack.ogg")
+				jetpackNitroSound = LoadSound("sfx/jetpack_nitro.ogg")
+			#Else
+				jetpackSound = LoadSound("sfx/jetpack.wav")
+				jetpackNitroSound = LoadSound("sfx/jetpack_nitro.wav")
+			#End	
 		End If
 		
 		_jetpackSound = jetpackSound

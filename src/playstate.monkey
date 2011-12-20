@@ -81,13 +81,25 @@ Public
 		_bg[1] = AloneGame.GetBgSprite()
 		_bg[2] = AloneGame.GetBgSprite()
 		
-		If (cylinderSound = Null) Then
-			cylinderSound = LoadSound("sfx/get_cylinder.mp3")
-			asteroidSound = LoadSound("sfx/asteroid_hit.mp3")			
+		If (cylinderSound = Null) Then			
+			#If TARGET = "flash"		
+				cylinderSound = LoadSound("sfx/get_cylinder.mp3")
+				asteroidSound = LoadSound("sfx/asteroid_hit.mp3")
+			#Elseif TARGET = "html5"
+				cylinderSound = LoadSound("sfx/get_cylinder.ogg")
+				asteroidSound = LoadSound("sfx/asteroid_hit.ogg")	
+			#Else
+				cylinderSound = LoadSound("sfx/get_cylinder.wav")
+				asteroidSound = LoadSound("sfx/asteroid_hit.wav")
+			#End			
 		End If
 		
 		_cylinderSound = cylinderSound
-		SetChannelVolume(CYLINDER_CHANNEL, .4)
+		#If TARGET <> "html5"
+			SetChannelVolume(CYLINDER_CHANNEL, .4)
+		#Else
+			SetChannelVolume(CYLINDER_CHANNEL, .6)
+		#End
 		
 		_asteroidSound = asteroidSound		
 		
@@ -139,12 +151,21 @@ Public
 		_startTip.visible = False
 		Add(_startTip)
 		
-		_spaceshipDistancePassed = START_DISTANCE
+		_spaceshipDistancePassed = START_DISTANCE		
 		
-		If (_from <> FROM_GAME_OVER) Then			
-			PlayMusic("sfx/main_theme.mp3")
-		End If		
-		SetMusicVolume(.8)
+		If (_from <> FROM_GAME_OVER) Then
+			#If TARGET = "flash" Or TARGET = "xna"		
+				PlayMusic("sfx/main_theme.mp3")
+			#Elseif TARGET = "html5"
+				PlayMusic("sfx/main_theme.ogg")
+			#Else
+				PlayMusic("sfx/main_theme.wav")
+			#End
+		End If
+		
+		#If TARGET <> "html5"		
+			SetMusicVolume(.8)
+		#End
 		
 		_isStart = True
 		_startTip.visible = True
@@ -271,7 +292,7 @@ Public
 		health.value = astronaut.health
 		nitro.value = astronaut.nitro
 		
-		distance.Text = Ceil(_spaceshipDistancePassed - _distancePassed)  + " KM"
+		distance.Text = int(Ceil(_spaceshipDistancePassed - _distancePassed))  + " KM"
 		
 		If (astronaut.speed.y <> 0) Then
 			FlxG.camera.Shake(-astronaut.speed.y / 3000, 0.1)

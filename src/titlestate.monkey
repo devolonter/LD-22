@@ -40,9 +40,18 @@ Private
 		
 		_titleAstro = LoadImage("gfx/title_astro.png")
 		_titleAsteroid = LoadImage("gfx/title_asteroid.png")
-				
-		PlayMusic("sfx/intro.mp3")
-		SetMusicVolume(.8)
+		
+		#If TARGET = "flash" Or TARGET = "xna"		
+			PlayMusic("sfx/intro.mp3")
+		#Elseif TARGET = "html5"
+			PlayMusic("sfx/intro.ogg")
+		#Else
+			PlayMusic("sfx/intro.wav")
+		#End
+		
+		#If TARGET <> "html5"
+			SetMusicVolume(.8)
+		#End
 	End Method
 	
 	Method Update:Void()
