@@ -153,15 +153,19 @@ Public
 		
 		_spaceshipDistancePassed = START_DISTANCE		
 		
-		If (_from <> FROM_GAME_OVER) Then
-			#If TARGET = "flash" Or TARGET = "xna"		
-				PlayMusic("sfx/main_theme.mp3")
-			#Elseif TARGET = "html5"
-				PlayMusic("sfx/main_theme.ogg")
-			#Else
-				PlayMusic("sfx/main_theme.wav")
-			#End
-		End If
+		#If TARGET <> "xna"
+			If (_from <> FROM_GAME_OVER) Then
+				#If TARGET = "flash" Or TARGET = "xna"		
+					PlayMusic("sfx/main_theme.mp3")
+				#Elseif TARGET = "html5"
+					PlayMusic("sfx/main_theme.ogg")
+				#Else
+					PlayMusic("sfx/main_theme.wav")
+				#End
+			End If
+		#Else
+			PlayMusic("sfx/main_theme.mp3")
+		#End
 		
 		#If TARGET <> "html5"		
 			SetMusicVolume(.8)
